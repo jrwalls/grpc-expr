@@ -1,0 +1,48 @@
+syntax = "proto3";
+package chat;
+option go_package = "/proto";
+
+import "google/protobuf/empty.proto";
+
+message loginRequest {
+    string username = 1;
+}
+
+message loginResponse {
+    string status = 1;
+}
+
+message message {
+    string body = 1;
+    string sender = 2;
+}
+
+enum userStatus {
+    JOINED = 0;
+    LEFT = 1;
+    AFK = 2;
+}
+
+message changeUserStatus {
+    string userId = 1;
+    userStatus status = 2;
+}
+
+message command {
+    oneof ask {
+        message message = 1;
+    }
+}
+
+message tell {
+    string id = 1;
+    oneof tell {
+        message message = 2;
+        changeUserStatus changeUserStatus = 3;
+    }
+}
+
+service ChatService {
+    rpc Login(loginRequest) returns (loginResponse) {}
+    rpc SubscribeToChannel(stream command) returns (stream tell) {}
+}
